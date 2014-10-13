@@ -19,7 +19,7 @@ Put the following dependency into pom.xml:
     <dependency>
       <groupId>org.codelibs</groupId>
       <artifactId>minhash</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
+      <version>0.1.0</version>
     </dependency>
 
 ## References
