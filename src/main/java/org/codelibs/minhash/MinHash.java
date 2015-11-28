@@ -242,10 +242,8 @@ public class MinHash {
         final Analyzer minhashAnalyzer = new Analyzer() {
             @Override
             protected TokenStreamComponents createComponents(
-                    final String fieldName, final Reader reader) {
-                @SuppressWarnings({ "deprecation", "resource" })
-                final Tokenizer baseTokenizer = tokenizer == null ? new WhitespaceTokenizer(
-                        Version.LUCENE_CURRENT, reader) : tokenizer;
+                    final String fieldName) {
+                final Tokenizer baseTokenizer = tokenizer == null ? new WhitespaceTokenizer() : tokenizer;
                 final TokenStream stream = new MinHashTokenFilter(
                         baseTokenizer, hashFunctions, hashBit);
                 return new TokenStreamComponents(baseTokenizer, stream);
