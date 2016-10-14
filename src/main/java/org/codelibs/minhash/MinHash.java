@@ -227,13 +227,26 @@ public class MinHash {
     }
 
     /**
+     * <p>Create an analyzer to calculate a minhash.</p>
+     * <p>Uses {@link WhitespaceTokenizer} as {@link Tokenizer}</p>
+     *
+     * @param hashBit the number of hash bits
+     * @param seed a base seed for hash function
+     * @param num the number of hash functions
+     * @return analyzer used by {@link MinHash#calculate(Analyzer, String)}
+     */
+    public static Analyzer createAnalyzer(final int hashBit, final int seed, final int num) {
+        return createAnalyzer(new WhitespaceTokenizer(), hashBit, seed, num);
+    }
+
+    /**
      * Create an analyzer to calculate a minhash.
      * 
      * @param tokenizer a tokenizer to parse a text
      * @param hashBit the number of hash bits
      * @param seed a base seed for hash function
      * @param num the number of hash functions
-     * @return
+     * @return analyzer used by {@link MinHash#calculate(Analyzer, String)}
      */
     public static Analyzer createAnalyzer(final Tokenizer tokenizer,
             final int hashBit, final int seed, final int num) {
@@ -243,10 +256,9 @@ public class MinHash {
             @Override
             protected TokenStreamComponents createComponents(
                     final String fieldName) {
-                final Tokenizer baseTokenizer = tokenizer == null ? new WhitespaceTokenizer() : tokenizer;
                 final TokenStream stream = new MinHashTokenFilter(
-                        baseTokenizer, hashFunctions, hashBit);
-                return new TokenStreamComponents(baseTokenizer, stream);
+                        tokenizer, hashFunctions, hashBit);
+                return new TokenStreamComponents(tokenizer, stream);
             }
         };
         return minhashAnalyzer;

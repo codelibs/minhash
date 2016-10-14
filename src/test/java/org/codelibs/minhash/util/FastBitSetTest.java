@@ -1,7 +1,5 @@
 package org.codelibs.minhash.util;
 
-import org.codelibs.minhash.util.FastBitSet;
-
 import junit.framework.TestCase;
 
 public class FastBitSetTest extends TestCase {
