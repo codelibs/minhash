@@ -13,8 +13,6 @@ public class MinHashTest extends TestCase {
     public void test_usercase1() throws IOException {
         String text = "Fess is very powerful and easily deployable Enterprise Search Server.";
 
-        // Lucene's tokenizer parses a text. WhitespaceTokenizer is used if null.
-        Tokenizer tokenizer = null;
         // The number of bits for each hash value.
         int hashBit = 1;
         // A base seed for hash functions.
@@ -22,7 +20,7 @@ public class MinHashTest extends TestCase {
         // The number of hash functions.
         int num = 128;
         // Analyzer for 1-bit 128 hash.
-        Analyzer analyzer = MinHash.createAnalyzer(tokenizer, hashBit, seed,
+        Analyzer analyzer = MinHash.createAnalyzer(hashBit, seed,
                 num);
 
         // Calculate a minhash value. The size is hashBit*num.
@@ -49,7 +47,7 @@ public class MinHashTest extends TestCase {
         final int hashBit = 1;
         final int seed = 0;
         final int num = 128;
-        final Analyzer minhashAnalyzer = MinHash.createAnalyzer(null, hashBit,
+        final Analyzer minhashAnalyzer = MinHash.createAnalyzer(hashBit,
                 seed, num);
         final StringBuilder[] texts = createTexts();
         final byte[][] data = createMinHashes(minhashAnalyzer, texts);
@@ -71,7 +69,7 @@ public class MinHashTest extends TestCase {
         final int hashBit = 1;
         final int seed = 100;
         final int num = 128;
-        final Analyzer minhashAnalyzer = MinHash.createAnalyzer(null, hashBit,
+        final Analyzer minhashAnalyzer = MinHash.createAnalyzer(hashBit,
                 seed, num);
         final StringBuilder[] texts = createTexts();
         final byte[][] data = createMinHashes(minhashAnalyzer, texts);
@@ -93,7 +91,7 @@ public class MinHashTest extends TestCase {
         final int hashBit = 2;
         final int seed = 0;
         final int num = 128;
-        final Analyzer minhashAnalyzer = MinHash.createAnalyzer(null, hashBit,
+        final Analyzer minhashAnalyzer = MinHash.createAnalyzer(hashBit,
                 seed, num);
         final StringBuilder[] texts = createTexts();
         final byte[][] data = createMinHashes(minhashAnalyzer, texts);
@@ -115,7 +113,7 @@ public class MinHashTest extends TestCase {
         final int hashBit = 1;
         final int seed = 0;
         final int num = 256;
-        final Analyzer minhashAnalyzer = MinHash.createAnalyzer(null, hashBit,
+        final Analyzer minhashAnalyzer = MinHash.createAnalyzer(hashBit,
                 seed, num);
         final StringBuilder[] texts = createTexts();
         final byte[][] data = createMinHashes(minhashAnalyzer, texts);
@@ -138,7 +136,7 @@ public class MinHashTest extends TestCase {
         final int hashBit = 1;
         final int seed = 0;
         final int num = 128;
-        final Analyzer minhashAnalyzer = MinHash.createAnalyzer(null, hashBit,
+        final Analyzer minhashAnalyzer = MinHash.createAnalyzer(hashBit,
                 seed, num);
         final StringBuilder[] texts = createMoreSimilarTexts();
         final byte[][] data = createMinHashes(minhashAnalyzer, texts);
@@ -320,11 +318,11 @@ public class MinHashTest extends TestCase {
 
     public void test_calculate() throws IOException {
 
-        final Analyzer minhashAnalyzer4 = MinHash.createAnalyzer(null, 1, 0, 4);
-        final Analyzer minhashAnalyzer8 = MinHash.createAnalyzer(null, 1, 0, 8);
-        final Analyzer minhashAnalyzer12 = MinHash.createAnalyzer(null, 1, 0,
+        final Analyzer minhashAnalyzer4 = MinHash.createAnalyzer(1, 0, 4);
+        final Analyzer minhashAnalyzer8 = MinHash.createAnalyzer(1, 0, 8);
+        final Analyzer minhashAnalyzer12 = MinHash.createAnalyzer( 1, 0,
                 12);
-        final Analyzer minhashAnalyzer16 = MinHash.createAnalyzer(null, 1, 0,
+        final Analyzer minhashAnalyzer16 = MinHash.createAnalyzer(1, 0,
                 16);
         final StringBuilder[] texts = createTexts();
 
@@ -340,11 +338,11 @@ public class MinHashTest extends TestCase {
 
     public void test_calculate_multiple_data() throws IOException {
 
-        final Analyzer minhashAnalyzer4 = MinHash.createAnalyzer(null, 1, 0, 4);
-        final Analyzer minhashAnalyzer8 = MinHash.createAnalyzer(null, 1, 0, 8);
-        final Analyzer minhashAnalyzer12 = MinHash.createAnalyzer(null, 1, 0,
+        final Analyzer minhashAnalyzer4 = MinHash.createAnalyzer(1, 0, 4);
+        final Analyzer minhashAnalyzer8 = MinHash.createAnalyzer(1, 0, 8);
+        final Analyzer minhashAnalyzer12 = MinHash.createAnalyzer(1, 0,
                 12);
-        final Analyzer minhashAnalyzer16 = MinHash.createAnalyzer(null, 1, 0,
+        final Analyzer minhashAnalyzer16 = MinHash.createAnalyzer(1, 0,
                 16);
         final StringBuilder[] texts = createTexts();
 

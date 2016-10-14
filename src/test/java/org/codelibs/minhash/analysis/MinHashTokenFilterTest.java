@@ -1,7 +1,5 @@
 package org.codelibs.minhash.analysis;
 
-import org.codelibs.minhash.analysis.MinHashTokenFilter;
-
 import junit.framework.TestCase;
 
 public class MinHashTokenFilterTest extends TestCase {
