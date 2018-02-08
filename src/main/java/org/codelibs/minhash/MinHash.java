@@ -1,14 +1,12 @@
 package org.codelibs.minhash;
 
 import java.io.IOException;
-import java.io.Reader;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.util.Version;
 import org.codelibs.minhash.analysis.MinHashTokenFilter;
 import org.codelibs.minhash.util.FastBitSet;
 
