@@ -28,7 +28,7 @@
     </parent>
 	<properties>
         <lucene.version>7.2.1</lucene.version>
-        <guava.version>24.0-jre</guava.version>
+        <guava.version>24.1.1-jre</guava.version>
 	</properties>
 	<build>
 		<plugins>
