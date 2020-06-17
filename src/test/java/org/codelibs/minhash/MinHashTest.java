@@ -2,11 +2,9 @@ package org.codelibs.minhash;
 
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.Tokenizer;
-import org.codelibs.minhash.MinHash;
+
+import junit.framework.TestCase;
 
 public class MinHashTest extends TestCase {
 
