@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012-2022 CodeLibs Project and the Others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package org.codelibs.minhash;
 
 import java.io.IOException;
@@ -16,7 +31,7 @@ import com.google.common.io.BaseEncoding;
 
 /**
  * This class is MinHash utility.
- * 
+ *
  * @author shinsuke
  *
  */
@@ -33,10 +48,8 @@ public class MinHash {
      * @param str2 MinHash base64 string
      * @return similarity (0 to 1.0f)
      */
-    public static float compare(final int numOfBits, final String str1,
-            final String str2) {
-        return compare(numOfBits, BaseEncoding.base64().decode(str1),
-                BaseEncoding.base64().decode(str2));
+    public static float compare(final int numOfBits, final String str1, final String str2) {
+        return compare(numOfBits, BaseEncoding.base64().decode(str1), BaseEncoding.base64().decode(str2));
     }
 
     /**
@@ -47,8 +60,7 @@ public class MinHash {
      * @return similarity (0 to 1.0f)
      */
     public static float compare(final String str1, final String str2) {
-        return compare(BaseEncoding.base64().decode(str1), BaseEncoding
-                .base64().decode(str2));
+        return compare(BaseEncoding.base64().decode(str1), BaseEncoding.base64().decode(str2));
     }
 
     /**
@@ -70,8 +82,7 @@ public class MinHash {
      * @param data2 MinHash bytes
      * @return similarity (0 to 1.0f)
      */
-    public static float compare(final int numOfBits, final byte[] data1,
-            final byte[] data2) {
+    public static float compare(final int numOfBits, final byte[] data1, final byte[] data2) {
         if (data1.length != data2.length) {
             return 0;
         }
@@ -97,13 +108,12 @@ public class MinHash {
 
     /**
      * Create hash functions.
-     * 
+     *
      * @param seed a base seed
      * @param num the number of hash functions.
      * @return
      */
-    public static HashFunction[] createHashFunctions(final int seed,
-            final int num) {
+    public static HashFunction[] createHashFunctions(final int seed, final int num) {
         final HashFunction[] hashFunctions = new HashFunction[num];
         for (int i = 0; i < num; i++) {
             hashFunctions[i] = Hashing.murmur3_128(seed + i);
@@ -113,18 +123,16 @@ public class MinHash {
 
     /**
      * Calculates MinHash value.
-     * 
+     *
      * @param analyzer analyzer to parse a text
      * @param text a target text
      * @return MinHash value
      * @throws IOException
      */
-    public static byte[] calculate(final Analyzer analyzer, final String text)
-            throws IOException {
+    public static byte[] calculate(final Analyzer analyzer, final String text) throws IOException {
         byte[] value = null;
         try (TokenStream stream = analyzer.tokenStream("minhash", text)) {
-            final CharTermAttribute termAtt = stream
-                    .addAttribute(CharTermAttribute.class);
+            final CharTermAttribute termAtt = stream.addAttribute(CharTermAttribute.class);
             stream.reset();
             if (stream.incrementToken()) {
                 final String minhashValue = termAtt.toString();
@@ -137,7 +145,7 @@ public class MinHash {
 
     /**
      * Calculates MinHash value.
-     * 
+     *
      * @param data data with analyzer, text and the number of bits
      * @return MinHash value
      * @throws IOException
@@ -148,7 +156,7 @@ public class MinHash {
 
     /**
      * Calculates MinHash value.
-     * 
+     *
      * @param data data with analyzer, text and the number of bits
      * @return MinHash value
      * @throws IOException
@@ -181,7 +189,7 @@ public class MinHash {
 
     /**
      * Returns a string formatted by bits.
-     * 
+     *
      * @param data
      * @return
      */
@@ -206,7 +214,7 @@ public class MinHash {
 
     /**
      * Count the number of true bits.
-     * 
+     *
      * @param data a target data
      * @return the number of true bits
      */
@@ -239,39 +247,33 @@ public class MinHash {
 
     /**
      * Create an analyzer to calculate a minhash.
-     * 
+     *
      * @param tokenizer a tokenizer to parse a text
      * @param hashBit the number of hash bits
      * @param seed a base seed for hash function
      * @param num the number of hash functions
      * @return analyzer used by {@link MinHash#calculate(Analyzer, String)}
      */
-    public static Analyzer createAnalyzer(final Tokenizer tokenizer,
-            final int hashBit, final int seed, final int num) {
-        final HashFunction[] hashFunctions = MinHash.createHashFunctions(seed,
-                num);
-        final Analyzer minhashAnalyzer = new Analyzer() {
+    public static Analyzer createAnalyzer(final Tokenizer tokenizer, final int hashBit, final int seed, final int num) {
+        final HashFunction[] hashFunctions = MinHash.createHashFunctions(seed, num);
+        return new Analyzer() {
             @Override
-            protected TokenStreamComponents createComponents(
-                    final String fieldName) {
-                final TokenStream stream = new MinHashTokenFilter(
-                        tokenizer, hashFunctions, hashBit);
+            protected TokenStreamComponents createComponents(final String fieldName) {
+                final TokenStream stream = new MinHashTokenFilter(tokenizer, hashFunctions, hashBit);
                 return new TokenStreamComponents(tokenizer, stream);
             }
         };
-        return minhashAnalyzer;
     }
 
     /**
      * Create a target data which has analyzer, text and the number of bits.
-     * 
+     *
      * @param analyzer
      * @param text
      * @param numOfBits
      * @return
      */
-    public static Data newData(final Analyzer analyzer, final String text,
-            final int numOfBits) {
+    public static Data newData(final Analyzer analyzer, final String text, final int numOfBits) {
         return new Data(analyzer, text, numOfBits);
     }
 

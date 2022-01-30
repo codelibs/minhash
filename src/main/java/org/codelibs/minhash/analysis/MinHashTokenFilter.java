@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012-2022 CodeLibs Project and the Others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package org.codelibs.minhash.analysis;
 
 import java.io.IOException;
@@ -16,7 +31,7 @@ import com.google.common.io.BaseEncoding;
 
 /**
  * This class is a token filter to calculate MinHash value.
- * 
+ *
  * @author shinsuke
  *
  */
@@ -28,16 +43,15 @@ public class MinHashTokenFilter extends TokenFilter {
 
     private final OffsetAttribute offsetAttr = addAttribute(OffsetAttribute.class);
 
-    private HashFunction[] hashFunctions;
+    private final HashFunction[] hashFunctions;
 
-    private int hashBit;
+    private final int hashBit;
 
-    private long[] minHashValues;
+    private final long[] minHashValues;
 
     private String minHash;
 
-    public MinHashTokenFilter(final TokenStream input,
-            final HashFunction[] hashFunctions, final int hashBit) {
+    public MinHashTokenFilter(final TokenStream input, final HashFunction[] hashFunctions, final int hashBit) {
         super(input);
         this.hashFunctions = hashFunctions;
         this.hashBit = hashBit;
@@ -50,8 +64,7 @@ public class MinHashTokenFilter extends TokenFilter {
         while (input.incrementToken()) {
             final String term = termAttr.toString();
             for (int i = 0; i < funcSize; i++) {
-                final HashCode hashCode = hashFunctions[i]
-                        .hashUnencodedChars(term);
+                final HashCode hashCode = hashFunctions[i].hashUnencodedChars(term);
                 final long value = hashCode.asLong();
                 if (value < minHashValues[i]) {
                     minHashValues[i] = value;
@@ -63,8 +76,7 @@ public class MinHashTokenFilter extends TokenFilter {
             return false;
         }
 
-        minHash = BaseEncoding.base64().encode(
-                calcMinHash(minHashValues, hashBit));
+        minHash = BaseEncoding.base64().encode(calcMinHash(minHashValues, hashBit));
         termAttr.setEmpty().append(minHash);
         posIncrAttr.setPositionIncrement(0);
         offsetAttr.setOffset(0, minHash.length());
@@ -79,8 +91,7 @@ public class MinHashTokenFilter extends TokenFilter {
         minHash = null;
     }
 
-    protected static byte[] calcMinHash(final long[] minHashValues,
-            final int hashBit) {
+    protected static byte[] calcMinHash(final long[] minHashValues, final int hashBit) {
         final int shift = 1;
         final int radix = 1 << shift;
         final long mask = radix - 1;

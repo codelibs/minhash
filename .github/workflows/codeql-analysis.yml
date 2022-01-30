@@ -7,10 +7,13 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [master]
+    branches:
+    - master
+    - "*.x"
   pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [master]
+    branches:
+    - master
+    - "*.x"
   schedule:
     - cron: '0 16 * * 4'
 
@@ -24,7 +27,7 @@ jobs:
       matrix:
         # Override automatic language detection by changing the below list
         # Supported options are ['csharp', 'cpp', 'go', 'java', 'javascript', 'python']
-        language: ['java']
+        language: [ 'java' ]
         # Learn more...
         # https://docs.github.com/en/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#overriding-automatic-language-detection
 
@@ -47,14 +50,14 @@ jobs:
       with:
         languages: ${{ matrix.language }}
         # If you wish to specify custom queries, you can do so here or in a config file.
-        # By default, queries listed here will override any specified in a config file. 
+        # By default, queries listed here will override any specified in a config file.
         # Prefix the list here with "+" to use these queries and those in the config file.
         # queries: ./path/to/local/query, your-org/your-repo/queries@main
 
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
+    #- name: Autobuild
+    #  uses: github/codeql-action/autobuild@v1
 
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 https://git.io/JvXDl
@@ -66,6 +69,20 @@ jobs:
     #- run: |
     #   make bootstrap
     #   make release
+    - uses: actions/checkout@v2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+    - name: Cache Maven packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
