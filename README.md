@@ -9,7 +9,6 @@ This library provides tools for b-bit MinHash algorism.
 ### Issues/Questions
 
 Please file an [issue](https://github.com/codelibs/minhash/issues "issue").
-(Japanese forum is [here](https://github.com/codelibs/codelibs-ja-forum "here").)
 
 ## Installation
 
@@ -21,7 +20,7 @@ Put the following dependency into pom.xml:
 <dependency>
   <groupId>org.codelibs</groupId>
   <artifactId>minhash</artifactId>
-  <version>0.2.0</version>
+  <version>0.4.0</version>
 </dependency>
 ```
 
@@ -32,8 +31,10 @@ Put the following dependency into pom.xml:
 MinHash class provides tools to calculate MinHash.
 
 ```java
+import org.apache.lucene.analysis.core.WhitespaceTokenizer;
+
 // Lucene's tokenizer parses a text.
-Tokenizer tokenizer = ...;
+Tokenizer tokenizer = new WhitespaceTokenizer();
 // The number of bits for each hash value.
 int hashBit = 1;
 // A base seed for hash functions.
