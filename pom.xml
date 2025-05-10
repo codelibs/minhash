@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.codelibs</groupId>
 	<artifactId>minhash</artifactId>
-	<version>0.4.1-SNAPSHOT</version>
+	<version>0.5.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<description>This library provides b-bit minhash algorism.</description>
 	<inceptionYear>2011</inceptionYear>
@@ -16,14 +16,27 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
+	<organization>
+		<name>CodeLibs Project</name>
+		<url>https://www.codelibs.org/</url>
+	</organization>
+	<developers>
+		<developer>
+			<id>shinsuke</id>
+			<name>Shinsuke Sugaya</name>
+			<email>shinsuke.sugaya@codelibs.co</email>
+			<organization>CodeLibs Inc.</organization>
+			<organizationUrl>https://codelibs.co</organizationUrl>
+		</developer>
+	</developers>
 	<scm>
 		<connection>scm:git:git@github.com:codelibs/minhash.git</connection>
 		<developerConnection>scm:git:git@github.com:codelibs/minhash.git</developerConnection>
 		<url>git@github.com:codelibs/minhash.git</url>
 	</scm>
 	<properties>
-		<lucene.version>9.8.0</lucene.version>
-		<guava.version>32.1.3-jre</guava.version>
+		<lucene.version>10.1.0</lucene.version>
+		<guava.version>33.4.8-jre</guava.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<build>
@@ -31,16 +44,16 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.11.0</version>
+				<version>3.14.0</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
-					<release>11</release>
+					<release>21</release>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.2.2</version>
+				<version>3.5.0</version>
 				<configuration>
 					<includes>
 						<include>**/*Test.java</include>
@@ -50,7 +63,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.10</version>
+				<version>0.8.13</version>
 				<executions>
 					<execution>
 						<goals>
@@ -69,7 +82,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.2.1</version>
+				<version>3.3.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -81,7 +94,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.6.2</version>
+				<version>3.11.2</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 					<docencoding>UTF-8</docencoding>
@@ -90,7 +103,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.3.0</version>
+				<version>3.4.2</version>
 				<configuration>
 					<archive>
 						<manifestEntries>
@@ -102,11 +115,11 @@
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-				<version>4.1</version>
+				<version>5.0.0</version>
 				<configuration>
 					<header>https://www.codelibs.org/assets/license/header.txt</header>
 					<properties>
-						<year>2022</year>
+						<year>2025</year>
 					</properties>
 					<includes>
 						<include>src/**/*.java</include>
