@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.codelibs</groupId>
 	<artifactId>minhash</artifactId>
-	<version>0.5.0</version>
+	<version>0.5.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<description>This library provides b-bit minhash algorism.</description>
 	<inceptionYear>2011</inceptionYear>
@@ -33,7 +33,7 @@
 		<connection>scm:git:git@github.com:codelibs/minhash.git</connection>
 		<developerConnection>scm:git:git@github.com:codelibs/minhash.git</developerConnection>
 		<url>git@github.com:codelibs/minhash.git</url>
-	  <tag>minhash-0.5.0</tag>
+	  <tag>HEAD</tag>
   </scm>
 	<properties>
 		<lucene.version>10.1.0</lucene.version>
