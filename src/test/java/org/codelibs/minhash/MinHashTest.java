@@ -411,4 +411,193 @@ public class MinHashTest extends TestCase {
                 .calculate(new MinHash.Data[] { MinHash.newData(
                         minhashAnalyzer16, texts[0].toString(), 16) })));
     }
+
+    public void test_bitCount() {
+        // Test with all zeros
+        assertEquals(0, MinHash.bitCount(new byte[] { 0x0 }));
+
+        // Test with single bits
+        assertEquals(1, MinHash.bitCount(new byte[] { 0x1 }));
+        assertEquals(1, MinHash.bitCount(new byte[] { 0x2 }));
+        assertEquals(2, MinHash.bitCount(new byte[] { 0x3 }));
+        assertEquals(1, MinHash.bitCount(new byte[] { 0x4 }));
+        assertEquals(2, MinHash.bitCount(new byte[] { 0x5 }));
+        assertEquals(2, MinHash.bitCount(new byte[] { 0x6 }));
+        assertEquals(3, MinHash.bitCount(new byte[] { 0x7 }));
+        assertEquals(1, MinHash.bitCount(new byte[] { 0x8 }));
+
+        // Test with all ones
+        assertEquals(8, MinHash.bitCount(new byte[] { (byte) 0xff }));
+
+        // Test with multiple bytes
+        assertEquals(16, MinHash.bitCount(new byte[] { (byte) 0xff, (byte) 0xff }));
+        assertEquals(8, MinHash.bitCount(new byte[] { (byte) 0xff, 0x0 }));
+        assertEquals(12, MinHash.bitCount(new byte[] { (byte) 0xf, (byte) 0xff }));
+
+        // Test with empty array
+        assertEquals(0, MinHash.bitCount(new byte[] {}));
+    }
+
+    public void test_toBinaryString_null() {
+        assertNull(MinHash.toBinaryString(null));
+    }
+
+    public void test_toBinaryString_emptyArray() {
+        assertEquals("", MinHash.toBinaryString(new byte[] {}));
+    }
+
+    public void test_createHashFunctions() {
+        // Test with different seeds and numbers
+        com.google.common.hash.HashFunction[] funcs1 = MinHash.createHashFunctions(0, 10);
+        assertNotNull(funcs1);
+        assertEquals(10, funcs1.length);
+
+        com.google.common.hash.HashFunction[] funcs2 = MinHash.createHashFunctions(100, 5);
+        assertNotNull(funcs2);
+        assertEquals(5, funcs2.length);
+
+        // Test with seed 0 and num 1
+        com.google.common.hash.HashFunction[] funcs3 = MinHash.createHashFunctions(0, 1);
+        assertNotNull(funcs3);
+        assertEquals(1, funcs3.length);
+
+        // Verify hash functions produce different results with different seeds
+        String testString = "test";
+        long hash1 = funcs1[0].hashUnencodedChars(testString).asLong();
+        long hash2 = funcs2[0].hashUnencodedChars(testString).asLong();
+        assertFalse(hash1 == hash2);
+    }
+
+    public void test_calculate_emptyText() throws IOException {
+        final Analyzer analyzer = MinHash.createAnalyzer(1, 0, 8);
+        final byte[] result = MinHash.calculate(analyzer, "");
+        assertNotNull(result);
+    }
+
+    public void test_calculate_singleWord() throws IOException {
+        final Analyzer analyzer = MinHash.createAnalyzer(1, 0, 8);
+        final byte[] result = MinHash.calculate(analyzer, "hello");
+        assertNotNull(result);
+        assertEquals(1, result.length);
+    }
+
+    public void test_calculate_multiple_data_with_different_analyzers() throws IOException {
+        final Analyzer analyzer1 = MinHash.createAnalyzer(1, 0, 8);
+        final Analyzer analyzer2 = MinHash.createAnalyzer(1, 0, 16);
+        final String text1 = "hello world";
+        final String text2 = "goodbye world";
+
+        final byte[] result = MinHash.calculate(new MinHash.Data[] {
+            MinHash.newData(analyzer1, text1, 8),
+            MinHash.newData(analyzer2, text2, 16)
+        });
+
+        assertNotNull(result);
+        assertEquals(3, result.length); // 8 + 16 = 24 bits = 3 bytes
+    }
+
+    public void test_calculate_multiple_data_empty_array() throws IOException {
+        final byte[] result = MinHash.calculate(new MinHash.Data[] {});
+        assertNotNull(result);
+        assertEquals(0, result.length);
+    }
+
+    public void test_newData() {
+        final Analyzer analyzer = MinHash.createAnalyzer(1, 0, 8);
+        final String text = "test text";
+        final int numOfBits = 8;
+
+        final MinHash.Data data = MinHash.newData(analyzer, text, numOfBits);
+
+        assertNotNull(data);
+        assertEquals(analyzer, data.analyzer);
+        assertEquals(text, data.text);
+        assertEquals(numOfBits, data.numOfBits);
+    }
+
+    public void test_compare_differentLengths() {
+        // When comparing byte arrays of different lengths, should return 0
+        assertEquals(0.0f, MinHash.compare(new byte[] { 0x1 }, new byte[] { 0x1, 0x1 }));
+        assertEquals(0.0f, MinHash.compare(new byte[] { 0x1, 0x2, 0x3 }, new byte[] { 0x1, 0x2 }));
+    }
+
+    public void test_compare_base64Strings() {
+        final String base64_1 = "AA==";  // byte array [0x00]
+        final String base64_2 = "AA==";  // byte array [0x00]
+        final String base64_3 = "/w==";  // byte array [0xff]
+
+        // Same strings should have similarity 1.0
+        assertEquals(1.0f, MinHash.compare(base64_1, base64_2));
+
+        // Different strings should have lower similarity
+        float similarity = MinHash.compare(base64_1, base64_3);
+        assertTrue(similarity >= 0.0f && similarity <= 1.0f);
+    }
+
+    public void test_compare_base64Strings_withNumOfBits() {
+        final String base64_1 = "AA==";  // byte array [0x00]
+        final String base64_2 = "AA==";  // byte array [0x00]
+
+        assertEquals(1.0f, MinHash.compare(8, base64_1, base64_2));
+        assertEquals(1.0f, MinHash.compare(4, base64_1, base64_2));
+    }
+
+    public void test_createAnalyzer_withDefaultTokenizer() {
+        final Analyzer analyzer = MinHash.createAnalyzer(1, 0, 8);
+        assertNotNull(analyzer);
+    }
+
+    public void test_createAnalyzer_withCustomTokenizer() throws IOException {
+        final org.apache.lucene.analysis.core.WhitespaceTokenizer tokenizer =
+            new org.apache.lucene.analysis.core.WhitespaceTokenizer();
+        final Analyzer analyzer = MinHash.createAnalyzer(tokenizer, 1, 0, 8);
+        assertNotNull(analyzer);
+    }
+
+    public void test_calculate_with_different_hashBits() throws IOException {
+        final Analyzer analyzer1 = MinHash.createAnalyzer(1, 0, 128);
+        final Analyzer analyzer2 = MinHash.createAnalyzer(2, 0, 128);
+        final Analyzer analyzer4 = MinHash.createAnalyzer(4, 0, 128);
+
+        final String text = "hello world test";
+
+        final byte[] result1 = MinHash.calculate(analyzer1, text);
+        final byte[] result2 = MinHash.calculate(analyzer2, text);
+        final byte[] result4 = MinHash.calculate(analyzer4, text);
+
+        // 1 bit * 128 = 128 bits = 16 bytes
+        assertEquals(16, result1.length);
+
+        // 2 bits * 128 = 256 bits = 32 bytes
+        assertEquals(32, result2.length);
+
+        // 4 bits * 128 = 512 bits = 64 bytes
+        assertEquals(64, result4.length);
+    }
+
+    public void test_countSameBits_multipleBytes() {
+        assertEquals(
+            24,
+            MinHash.countSameBits(
+                new byte[] { 0x0, 0x0, 0x0 },
+                new byte[] { 0x0, 0x0, 0x0 }
+            )
+        );
+
+        assertEquals(
+            16,
+            MinHash.countSameBits(
+                new byte[] { (byte) 0xff, (byte) 0xff, 0x0 },
+                new byte[] { 0x0, 0x0, 0x0 }
+            )
+        );
+
+        assertEquals(
+            8,
+            MinHash.countSameBits(
+                new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff },
+                new byte[] { 0x0, 0x0, 0x0 }
+            )
+        );
+    }
 }
