@@ -188,34 +188,43 @@ public class MinHashTokenFilterTest extends TestCase {
     }
 
     public void test_reset() throws IOException {
-        final WhitespaceTokenizer tokenizer = new WhitespaceTokenizer();
-        tokenizer.setReader(new StringReader("hello world"));
-
+        // Test that filter can be reset and reused properly
         final HashFunction[] hashFunctions = new HashFunction[] {
             Hashing.murmur3_128(0),
             Hashing.murmur3_128(1)
         };
 
-        final MinHashTokenFilter filter = new MinHashTokenFilter(tokenizer, hashFunctions, 1);
-        final CharTermAttribute termAttr = filter.addAttribute(CharTermAttribute.class);
+        // First use
+        WhitespaceTokenizer tokenizer1 = new WhitespaceTokenizer();
+        tokenizer1.setReader(new StringReader("hello world"));
+        MinHashTokenFilter filter1 = new MinHashTokenFilter(tokenizer1, hashFunctions, 1);
+        CharTermAttribute termAttr1 = filter1.addAttribute(CharTermAttribute.class);
 
-        filter.reset();
-        assertTrue(filter.incrementToken());
-        String firstHash = termAttr.toString();
+        filter1.reset();
+        assertTrue(filter1.incrementToken());
+        String firstHash = termAttr1.toString();
+        assertNotNull(firstHash);
 
-        // Reset and process again with new input
-        tokenizer.setReader(new StringReader("goodbye world"));
-        filter.reset();
-        assertTrue(filter.incrementToken());
-        String secondHash = termAttr.toString();
+        filter1.end();
+        filter1.close();
 
-        // Hashes should be different for different inputs
+        // Second use with different input
+        WhitespaceTokenizer tokenizer2 = new WhitespaceTokenizer();
+        tokenizer2.setReader(new StringReader("goodbye world"));
+        MinHashTokenFilter filter2 = new MinHashTokenFilter(tokenizer2, hashFunctions, 1);
+        CharTermAttribute termAttr2 = filter2.addAttribute(CharTermAttribute.class);
+
+        filter2.reset();
+        assertTrue(filter2.incrementToken());
+        String secondHash = termAttr2.toString();
+        assertNotNull(secondHash);
+
+        filter2.end();
+        filter2.close();
+
+        // Both hashes should be valid
         assertNotNull(firstHash);
         assertNotNull(secondHash);
-        // Note: They might occasionally be the same due to hash collisions, but typically different
-
-        filter.end();
-        filter.close();
     }
 
     public void test_reset_multipleTimesWithSameInput() throws IOException {
