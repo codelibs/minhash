@@ -16,7 +16,9 @@
 package org.codelibs.minhash.util;
 
 /**
- * Immutable bits set.
+ * Fast bit set implementation for efficient bit manipulation.
+ * This class provides a lightweight alternative to {@link java.util.BitSet}
+ * with minimal overhead for fixed-size bit arrays.
  *
  * @author shinsuke
  *
@@ -43,57 +45,11 @@ public class FastBitSet {
             return;
         }
 
-        switch (bitPos) {
-        case 0:
-            data[bytePos] = (byte) (data[bytePos] & 0xfe);
-            if (value) {
-                data[bytePos] = (byte) (data[bytePos] | 0x01);
-            }
-            break;
-        case 1:
-            data[bytePos] = (byte) (data[bytePos] & 0xfd);
-            if (value) {
-                data[bytePos] = (byte) (data[bytePos] | 0x02);
-            }
-            break;
-        case 2:
-            data[bytePos] = (byte) (data[bytePos] & 0xfb);
-            if (value) {
-                data[bytePos] = (byte) (data[bytePos] | 0x04);
-            }
-            break;
-        case 3:
-            data[bytePos] = (byte) (data[bytePos] & 0xf7);
-            if (value) {
-                data[bytePos] = (byte) (data[bytePos] | 0x08);
-            }
-            break;
-        case 4:
-            data[bytePos] = (byte) (data[bytePos] & 0xef);
-            if (value) {
-                data[bytePos] = (byte) (data[bytePos] | 0x10);
-            }
-            break;
-        case 5:
-            data[bytePos] = (byte) (data[bytePos] & 0xdf);
-            if (value) {
-                data[bytePos] = (byte) (data[bytePos] | 0x20);
-            }
-            break;
-        case 6:
-            data[bytePos] = (byte) (data[bytePos] & 0xbf);
-            if (value) {
-                data[bytePos] = (byte) (data[bytePos] | 0x40);
-            }
-            break;
-        case 7:
-            data[bytePos] = (byte) (data[bytePos] & 0x7f);
-            if (value) {
-                data[bytePos] = (byte) (data[bytePos] | 0x80);
-            }
-            break;
-        default:
-            break;
+        final int mask = 1 << bitPos;
+        if (value) {
+            data[bytePos] = (byte) (data[bytePos] | mask);
+        } else {
+            data[bytePos] = (byte) (data[bytePos] & ~mask);
         }
     }
 

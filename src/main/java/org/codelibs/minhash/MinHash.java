@@ -49,6 +49,9 @@ public class MinHash {
      * @return similarity (0 to 1.0f)
      */
     public static float compare(final int numOfBits, final String str1, final String str2) {
+        if (str1 == null || str2 == null) {
+            return 0;
+        }
         return compare(numOfBits, BaseEncoding.base64().decode(str1), BaseEncoding.base64().decode(str2));
     }
 
@@ -60,6 +63,9 @@ public class MinHash {
      * @return similarity (0 to 1.0f)
      */
     public static float compare(final String str1, final String str2) {
+        if (str1 == null || str2 == null) {
+            return 0;
+        }
         return compare(BaseEncoding.base64().decode(str1), BaseEncoding.base64().decode(str2));
     }
 
@@ -71,6 +77,9 @@ public class MinHash {
      * @return similarity (0 to 1.0f)
      */
     public static float compare(final byte[] data1, final byte[] data2) {
+        if (data1 == null || data2 == null) {
+            return 0;
+        }
         return compare(data1.length * 8, data1, data2);
     }
 
@@ -83,7 +92,7 @@ public class MinHash {
      * @return similarity (0 to 1.0f)
      */
     public static float compare(final int numOfBits, final byte[] data1, final byte[] data2) {
-        if (data1.length != data2.length) {
+        if (data1 == null || data2 == null || data1.length != data2.length) {
             return 0;
         }
         final int count = countSameBits(data1, data2);
@@ -93,15 +102,10 @@ public class MinHash {
     protected static int countSameBits(final byte[] data1, final byte[] data2) {
         int count = 0;
         for (int i = 0; i < data1.length; i++) {
-            byte b1 = data1[i];
-            byte b2 = data2[i];
-            for (int j = 0; j < 8; j++) {
-                if ((b1 & 1) == (b2 & 1)) {
-                    count++;
-                }
-                b1 >>= 1;
-                b2 >>= 1;
-            }
+            // XOR to find differing bits, then count the zeros (same bits)
+            // Same bits: 8 - number of differing bits
+            final int xor = (data1[i] ^ data2[i]) & 0xFF;
+            count += 8 - Integer.bitCount(xor);
         }
         return count;
     }
@@ -111,7 +115,7 @@ public class MinHash {
      *
      * @param seed a base seed
      * @param num the number of hash functions.
-     * @return
+     * @return array of hash functions
      */
     public static HashFunction[] createHashFunctions(final int seed, final int num) {
         final HashFunction[] hashFunctions = new HashFunction[num];
@@ -190,8 +194,8 @@ public class MinHash {
     /**
      * Returns a string formatted by bits.
      *
-     * @param data
-     * @return
+     * @param data the byte array to convert
+     * @return binary string representation (MSB first), or null if data is null
      */
     public static String toBinaryString(final byte[] data) {
         if (data == null) {
@@ -219,15 +223,12 @@ public class MinHash {
      * @return the number of true bits
      */
     public static int bitCount(final byte[] data) {
+        if (data == null) {
+            return 0;
+        }
         int count = 0;
         for (final byte element : data) {
-            byte bits = element;
-            for (int j = 0; j < 8; j++) {
-                if ((bits & 1) == 1) {
-                    count++;
-                }
-                bits >>= 1;
-            }
+            count += Integer.bitCount(element & 0xFF);
         }
         return count;
     }
@@ -268,26 +269,22 @@ public class MinHash {
     /**
      * Create a target data which has analyzer, text and the number of bits.
      *
-     * @param analyzer
-     * @param text
-     * @param numOfBits
-     * @return
+     * @param analyzer the analyzer to use for tokenization
+     * @param text the text to calculate MinHash from
+     * @param numOfBits the number of bits for MinHash calculation
+     * @return a new Data instance
      */
     public static Data newData(final Analyzer analyzer, final String text, final int numOfBits) {
         return new Data(analyzer, text, numOfBits);
     }
 
-    public static class Data {
-        final int numOfBits;
-
-        final String text;
-
-        final Analyzer analyzer;
-
-        Data(final Analyzer analyzer, final String text, final int numOfBits) {
-            this.numOfBits = numOfBits;
-            this.text = text;
-            this.analyzer = analyzer;
-        }
+    /**
+     * Data record for MinHash calculation containing analyzer, text, and bit count.
+     *
+     * @param analyzer the analyzer to use for tokenization
+     * @param text the text to calculate MinHash from
+     * @param numOfBits the number of bits for MinHash calculation
+     */
+    public record Data(Analyzer analyzer, String text, int numOfBits) {
     }
 }
