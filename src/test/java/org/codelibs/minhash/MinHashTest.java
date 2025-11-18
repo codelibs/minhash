@@ -603,4 +603,297 @@ public class MinHashTest extends TestCase {
             )
         );
     }
+
+    // ========== Tests for null safety improvements ==========
+
+    public void test_compare_bytes_withNull() {
+        final byte[] data = new byte[] { 0x01, 0x02, 0x03 };
+
+        // Null first argument
+        assertEquals(0.0f, MinHash.compare(null, data));
+
+        // Null second argument
+        assertEquals(0.0f, MinHash.compare(data, null));
+
+        // Both null
+        assertEquals(0.0f, MinHash.compare(null, null));
+    }
+
+    public void test_compare_bytes_withNumOfBits_withNull() {
+        final byte[] data = new byte[] { 0x01, 0x02, 0x03 };
+        final int numOfBits = 24;
+
+        // Null first argument
+        assertEquals(0.0f, MinHash.compare(numOfBits, null, data));
+
+        // Null second argument
+        assertEquals(0.0f, MinHash.compare(numOfBits, data, null));
+
+        // Both null
+        assertEquals(0.0f, MinHash.compare(numOfBits, null, null));
+    }
+
+    public void test_compare_strings_withNull() {
+        final String encoded = "AQID"; // Base64 for {0x01, 0x02, 0x03}
+
+        // Null first argument
+        assertEquals(0.0f, MinHash.compare(null, encoded));
+
+        // Null second argument
+        assertEquals(0.0f, MinHash.compare(encoded, null));
+
+        // Both null
+        assertEquals(0.0f, MinHash.compare(null, null));
+    }
+
+    public void test_compare_strings_withNumOfBits_withNull() {
+        final String encoded = "AQID"; // Base64 for {0x01, 0x02, 0x03}
+        final int numOfBits = 24;
+
+        // Null first argument
+        assertEquals(0.0f, MinHash.compare(numOfBits, null, encoded));
+
+        // Null second argument
+        assertEquals(0.0f, MinHash.compare(numOfBits, encoded, null));
+
+        // Both null
+        assertEquals(0.0f, MinHash.compare(numOfBits, null, null));
+    }
+
+    public void test_bitCount_withNull() {
+        // Null input should return 0
+        assertEquals(0, MinHash.bitCount(null));
+    }
+
+    public void test_bitCount_withEmptyArray() {
+        // Empty array should return 0
+        assertEquals(0, MinHash.bitCount(new byte[0]));
+    }
+
+    public void test_bitCount_optimized_implementation() {
+        // Test that the optimized Integer.bitCount() implementation works correctly
+        // Test various bit patterns
+
+        // All zeros
+        assertEquals(0, MinHash.bitCount(new byte[] { 0x00 }));
+
+        // All ones (8 bits)
+        assertEquals(8, MinHash.bitCount(new byte[] { (byte) 0xFF }));
+
+        // Mixed patterns
+        assertEquals(1, MinHash.bitCount(new byte[] { 0x01 })); // 00000001
+        assertEquals(2, MinHash.bitCount(new byte[] { 0x03 })); // 00000011
+        assertEquals(4, MinHash.bitCount(new byte[] { 0x0F })); // 00001111
+        assertEquals(4, MinHash.bitCount(new byte[] { (byte) 0xF0 })); // 11110000
+        assertEquals(4, MinHash.bitCount(new byte[] { (byte) 0xAA })); // 10101010
+        assertEquals(4, MinHash.bitCount(new byte[] { 0x55 })); // 01010101
+
+        // Multiple bytes
+        assertEquals(16, MinHash.bitCount(new byte[] { (byte) 0xFF, (byte) 0xFF }));
+        assertEquals(8, MinHash.bitCount(new byte[] { (byte) 0xFF, 0x00 }));
+        assertEquals(12, MinHash.bitCount(new byte[] { (byte) 0xAA, (byte) 0xAA, (byte) 0xAA }));
+    }
+
+    // ========== Tests for Java 21 record implementation ==========
+
+    public void test_data_record_creation() throws IOException {
+        final Analyzer analyzer = MinHash.createAnalyzer(1, 0, 128);
+        final String text = "test text";
+        final int numOfBits = 128;
+
+        final MinHash.Data data = MinHash.newData(analyzer, text, numOfBits);
+
+        assertNotNull(data);
+        assertEquals(analyzer, data.analyzer());
+        assertEquals(text, data.text());
+        assertEquals(numOfBits, data.numOfBits());
+    }
+
+    public void test_data_record_equality() throws IOException {
+        final Analyzer analyzer1 = MinHash.createAnalyzer(1, 0, 128);
+        final Analyzer analyzer2 = MinHash.createAnalyzer(1, 0, 128);
+        final String text = "test text";
+        final int numOfBits = 128;
+
+        final MinHash.Data data1 = MinHash.newData(analyzer1, text, numOfBits);
+        final MinHash.Data data2 = MinHash.newData(analyzer1, text, numOfBits);
+        final MinHash.Data data3 = MinHash.newData(analyzer2, "different", numOfBits);
+
+        // Same instance
+        assertEquals(data1, data1);
+
+        // Same values, same analyzer instance
+        assertEquals(data1, data2);
+
+        // Different values
+        assertFalse(data1.equals(data3));
+    }
+
+    public void test_data_record_hashCode() throws IOException {
+        final Analyzer analyzer = MinHash.createAnalyzer(1, 0, 128);
+        final String text = "test text";
+        final int numOfBits = 128;
+
+        final MinHash.Data data1 = MinHash.newData(analyzer, text, numOfBits);
+        final MinHash.Data data2 = MinHash.newData(analyzer, text, numOfBits);
+
+        // Same values should produce same hash code
+        assertEquals(data1.hashCode(), data2.hashCode());
+    }
+
+    public void test_data_record_toString() throws IOException {
+        final Analyzer analyzer = MinHash.createAnalyzer(1, 0, 128);
+        final String text = "test text";
+        final int numOfBits = 128;
+
+        final MinHash.Data data = MinHash.newData(analyzer, text, numOfBits);
+        final String toString = data.toString();
+
+        // Record toString should contain the field values
+        assertNotNull(toString);
+        assertTrue(toString.contains("test text"));
+        assertTrue(toString.contains("128"));
+    }
+
+    public void test_data_record_with_calculate() throws IOException {
+        final Analyzer analyzer = MinHash.createAnalyzer(1, 0, 128);
+        final String text = "test text for minhash";
+        final int numOfBits = 128;
+
+        final MinHash.Data data = MinHash.newData(analyzer, text, numOfBits);
+
+        // Should work with MinHash.calculate(Data)
+        final byte[] result = MinHash.calculate(data);
+
+        assertNotNull(result);
+        assertEquals(16, result.length); // 128 bits = 16 bytes
+    }
+
+    public void test_data_record_with_calculate_array() throws IOException {
+        final Analyzer analyzer1 = MinHash.createAnalyzer(1, 0, 64);
+        final Analyzer analyzer2 = MinHash.createAnalyzer(1, 0, 64);
+
+        final MinHash.Data data1 = MinHash.newData(analyzer1, "first text", 64);
+        final MinHash.Data data2 = MinHash.newData(analyzer2, "second text", 64);
+
+        final MinHash.Data[] dataArray = new MinHash.Data[] { data1, data2 };
+
+        // Should work with MinHash.calculate(Data[])
+        final byte[] result = MinHash.calculate(dataArray);
+
+        assertNotNull(result);
+        assertEquals(16, result.length); // 64 + 64 bits = 128 bits = 16 bytes
+    }
+
+    // ========== Tests for optimized countSameBits implementation ==========
+
+    public void test_countSameBits_optimized_allSame() {
+        // Test XOR-based implementation with identical bytes
+        final byte[] data1 = new byte[] { (byte) 0xAA, (byte) 0x55, (byte) 0xFF };
+        final byte[] data2 = new byte[] { (byte) 0xAA, (byte) 0x55, (byte) 0xFF };
+
+        // All 24 bits should match
+        assertEquals(24, MinHash.countSameBits(data1, data2));
+    }
+
+    public void test_countSameBits_optimized_allDifferent() {
+        // Test XOR-based implementation with completely different bytes
+        // 0xFF XOR 0x00 = 0xFF (all bits differ, 0 matching)
+        final byte[] data1 = new byte[] { (byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
+        final byte[] data2 = new byte[] { 0x00, 0x00, 0x00 };
+
+        // 0 bits should match
+        assertEquals(0, MinHash.countSameBits(data1, data2));
+    }
+
+    public void test_countSameBits_optimized_partialMatch() {
+        // Test XOR-based implementation with partial matches
+        // 0xF0 = 11110000
+        // 0x0F = 00001111
+        // XOR  = 11111111 (all 8 bits differ, 0 matching)
+        final byte[] data1 = new byte[] { (byte) 0xF0 };
+        final byte[] data2 = new byte[] { 0x0F };
+
+        assertEquals(0, MinHash.countSameBits(data1, data2));
+
+        // 0xF0 = 11110000
+        // 0xF0 = 11110000
+        // XOR  = 00000000 (all 8 bits match)
+        final byte[] data3 = new byte[] { (byte) 0xF0 };
+        final byte[] data4 = new byte[] { (byte) 0xF0 };
+
+        assertEquals(8, MinHash.countSameBits(data3, data4));
+
+        // 0xAA = 10101010
+        // 0x55 = 01010101
+        // XOR  = 11111111 (all 8 bits differ, 0 matching)
+        final byte[] data5 = new byte[] { (byte) 0xAA };
+        final byte[] data6 = new byte[] { 0x55 };
+
+        assertEquals(0, MinHash.countSameBits(data5, data6));
+    }
+
+    public void test_countSameBits_optimized_mixedPatterns() {
+        // Test various patterns to ensure XOR-based implementation is correct
+        // 0x80 = 10000000
+        // 0x00 = 00000000
+        // XOR  = 10000000 (1 bit differs, 7 bits match)
+        final byte[] data1 = new byte[] { (byte) 0x80 };
+        final byte[] data2 = new byte[] { 0x00 };
+
+        assertEquals(7, MinHash.countSameBits(data1, data2));
+
+        // 0x81 = 10000001
+        // 0x01 = 00000001
+        // XOR  = 10000000 (1 bit differs, 7 bits match)
+        final byte[] data3 = new byte[] { (byte) 0x81 };
+        final byte[] data4 = new byte[] { 0x01 };
+
+        assertEquals(7, MinHash.countSameBits(data3, data4));
+
+        // 0xFF = 11111111
+        // 0x7F = 01111111
+        // XOR  = 10000000 (1 bit differs, 7 bits match)
+        final byte[] data5 = new byte[] { (byte) 0xFF };
+        final byte[] data6 = new byte[] { 0x7F };
+
+        assertEquals(7, MinHash.countSameBits(data5, data6));
+    }
+
+    public void test_countSameBits_optimized_multipleBytes_complex() {
+        // Test XOR-based implementation with complex multi-byte patterns
+        // byte 1: 0xFF vs 0x00 = 0 matching bits
+        // byte 2: 0xAA vs 0xAA = 8 matching bits
+        // byte 3: 0x0F vs 0x1F = 0x10 XOR = 00010000 = 1 bit differs, 7 match
+        // Total: 0 + 8 + 7 = 15
+        final byte[] data1 = new byte[] { (byte) 0xFF, (byte) 0xAA, 0x0F };
+        final byte[] data2 = new byte[] { 0x00, (byte) 0xAA, 0x1F };
+
+        assertEquals(15, MinHash.countSameBits(data1, data2));
+    }
+
+    public void test_countSameBits_optimized_edgeCases() {
+        // Test with single byte arrays
+        final byte[] single1 = new byte[] { 0x00 };
+        final byte[] single2 = new byte[] { 0x00 };
+        assertEquals(8, MinHash.countSameBits(single1, single2));
+
+        // Test with large arrays
+        final byte[] large1 = new byte[100];
+        final byte[] large2 = new byte[100];
+        for (int i = 0; i < 100; i++) {
+            large1[i] = (byte) 0xFF;
+            large2[i] = (byte) 0xFF;
+        }
+        assertEquals(800, MinHash.countSameBits(large1, large2)); // 100 bytes * 8 bits
+
+        // Test with alternating patterns
+        final byte[] alt1 = new byte[10];
+        final byte[] alt2 = new byte[10];
+        for (int i = 0; i < 10; i++) {
+            alt1[i] = (byte) (i % 2 == 0 ? 0xAA : 0x55);
+            alt2[i] = (byte) (i % 2 == 0 ? 0xAA : 0x55);
+        }
+        assertEquals(80, MinHash.countSameBits(alt1, alt2)); // All bits match
+    }
 }
