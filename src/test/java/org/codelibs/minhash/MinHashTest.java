@@ -505,9 +505,9 @@ public class MinHashTest extends TestCase {
         final MinHash.Data data = MinHash.newData(analyzer, text, numOfBits);
 
         assertNotNull(data);
-        assertEquals(analyzer, data.analyzer);
-        assertEquals(text, data.text);
-        assertEquals(numOfBits, data.numOfBits);
+        assertEquals(analyzer, data.analyzer());
+        assertEquals(text, data.text());
+        assertEquals(numOfBits, data.numOfBits());
     }
 
     public void test_compare_differentLengths() {
@@ -610,13 +610,13 @@ public class MinHashTest extends TestCase {
         final byte[] data = new byte[] { 0x01, 0x02, 0x03 };
 
         // Null first argument
-        assertEquals(0.0f, MinHash.compare(null, data));
+        assertEquals(0.0f, MinHash.compare((byte[]) null, data));
 
         // Null second argument
-        assertEquals(0.0f, MinHash.compare(data, null));
+        assertEquals(0.0f, MinHash.compare(data, (byte[]) null));
 
         // Both null
-        assertEquals(0.0f, MinHash.compare(null, null));
+        assertEquals(0.0f, MinHash.compare((byte[]) null, (byte[]) null));
     }
 
     public void test_compare_bytes_withNumOfBits_withNull() {
@@ -624,26 +624,26 @@ public class MinHashTest extends TestCase {
         final int numOfBits = 24;
 
         // Null first argument
-        assertEquals(0.0f, MinHash.compare(numOfBits, null, data));
+        assertEquals(0.0f, MinHash.compare(numOfBits, (byte[]) null, data));
 
         // Null second argument
-        assertEquals(0.0f, MinHash.compare(numOfBits, data, null));
+        assertEquals(0.0f, MinHash.compare(numOfBits, data, (byte[]) null));
 
         // Both null
-        assertEquals(0.0f, MinHash.compare(numOfBits, null, null));
+        assertEquals(0.0f, MinHash.compare(numOfBits, (byte[]) null, (byte[]) null));
     }
 
     public void test_compare_strings_withNull() {
         final String encoded = "AQID"; // Base64 for {0x01, 0x02, 0x03}
 
         // Null first argument
-        assertEquals(0.0f, MinHash.compare(null, encoded));
+        assertEquals(0.0f, MinHash.compare((String) null, encoded));
 
         // Null second argument
-        assertEquals(0.0f, MinHash.compare(encoded, null));
+        assertEquals(0.0f, MinHash.compare(encoded, (String) null));
 
         // Both null
-        assertEquals(0.0f, MinHash.compare(null, null));
+        assertEquals(0.0f, MinHash.compare((String) null, (String) null));
     }
 
     public void test_compare_strings_withNumOfBits_withNull() {
@@ -651,13 +651,13 @@ public class MinHashTest extends TestCase {
         final int numOfBits = 24;
 
         // Null first argument
-        assertEquals(0.0f, MinHash.compare(numOfBits, null, encoded));
+        assertEquals(0.0f, MinHash.compare(numOfBits, (String) null, encoded));
 
         // Null second argument
-        assertEquals(0.0f, MinHash.compare(numOfBits, encoded, null));
+        assertEquals(0.0f, MinHash.compare(numOfBits, encoded, (String) null));
 
         // Both null
-        assertEquals(0.0f, MinHash.compare(numOfBits, null, null));
+        assertEquals(0.0f, MinHash.compare(numOfBits, (String) null, (String) null));
     }
 
     public void test_bitCount_withNull() {
