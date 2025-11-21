@@ -46,7 +46,8 @@ public class MinHash {
      * @param numOfBits The number of MinHash bits
      * @param str1 MinHash base64 string
      * @param str2 MinHash base64 string
-     * @return similarity (0 to 1.0f)
+     * @return similarity (0 to 1.0f), or 0 if either argument is null.
+     *         Note: 0 can represent both "completely dissimilar" and "invalid comparison due to null input".
      */
     public static float compare(final int numOfBits, final String str1, final String str2) {
         if (str1 == null || str2 == null) {
@@ -60,7 +61,8 @@ public class MinHash {
      *
      * @param str1 MinHash base64 string
      * @param str2 MinHash base64 string
-     * @return similarity (0 to 1.0f)
+     * @return similarity (0 to 1.0f), or 0 if either argument is null.
+     *         Note: 0 can represent both "completely dissimilar" and "invalid comparison due to null input".
      */
     public static float compare(final String str1, final String str2) {
         if (str1 == null || str2 == null) {
@@ -74,7 +76,8 @@ public class MinHash {
      *
      * @param data1 MinHash bytes
      * @param data2 MinHash bytes
-     * @return similarity (0 to 1.0f)
+     * @return similarity (0 to 1.0f), or 0 if either argument is null.
+     *         Note: 0 can represent both "completely dissimilar" and "invalid comparison due to null input".
      */
     public static float compare(final byte[] data1, final byte[] data2) {
         if (data1 == null || data2 == null) {
@@ -89,7 +92,8 @@ public class MinHash {
      * @param numOfBits The number of MinHash bits
      * @param data1 MinHash bytes
      * @param data2 MinHash bytes
-     * @return similarity (0 to 1.0f)
+     * @return similarity (0 to 1.0f), or 0 if either argument is null or arrays have different lengths.
+     *         Note: 0 can represent "completely dissimilar", "different array lengths", or "invalid comparison due to null input".
      */
     public static float compare(final int numOfBits, final byte[] data1, final byte[] data2) {
         if (data1 == null || data2 == null || data1.length != data2.length) {
@@ -220,7 +224,8 @@ public class MinHash {
      * Count the number of true bits.
      *
      * @param data a target data
-     * @return the number of true bits
+     * @return the number of true bits, or 0 if data is null.
+     *         Note: 0 can represent both "no bits set" and "null input".
      */
     public static int bitCount(final byte[] data) {
         if (data == null) {
