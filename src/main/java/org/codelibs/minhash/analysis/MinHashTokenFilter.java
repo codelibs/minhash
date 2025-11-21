@@ -91,6 +91,15 @@ public class MinHashTokenFilter extends TokenFilter {
         minHash = null;
     }
 
+    /**
+     * Converts minimum hash values to a byte array representation.
+     * This method extracts the least significant bits from each hash value
+     * according to the specified bit depth (hashBit parameter).
+     *
+     * @param minHashValues array of minimum hash values computed from tokens
+     * @param hashBit number of bits to extract from each hash value (typically 1, 2, 4, or 8)
+     * @return byte array containing the b-bit MinHash signature
+     */
     protected static byte[] calcMinHash(final long[] minHashValues, final int hashBit) {
         final int shift = 1;
         final int radix = 1 << shift;
