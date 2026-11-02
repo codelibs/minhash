@@ -37,7 +37,7 @@
   </scm>
 	<properties>
 		<lucene.version>10.1.0</lucene.version>
-		<guava.version>33.4.8-jre</guava.version>
+		<guava.version>33.7.1-jre</guava.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<build>
